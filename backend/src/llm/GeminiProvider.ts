@@ -24,24 +24,19 @@ const GEMINI_SCHEMA = {
           lead_owner: { type: 'STRING', description: 'Lead owner/agent' },
           crm_status: { 
             type: 'STRING', 
-            enum: ['GOOD_LEAD_FOLLOW_UP', 'DID_NOT_CONNECT', 'BAD_LEAD', 'SALE_DONE', ''],
+            enum: ['GOOD_LEAD_FOLLOW_UP', 'DID_NOT_CONNECT', 'BAD_LEAD', 'SALE_DONE'],
             description: 'Target CRM status selection'
           },
           crm_note: { type: 'STRING', description: 'CRM notes, extras, and unmapped fields' },
           data_source: {
             type: 'STRING',
-            enum: ['leads_on_demand', 'meridian_tower', 'eden_park', 'varah_swamy', 'sarjapur_plots', ''],
+            enum: ['leads_on_demand', 'meridian_tower', 'eden_park', 'varah_swamy', 'sarjapur_plots'],
             description: 'Target lead source selection'
           },
           possession_time: { type: 'STRING', description: 'Possession time info' },
           description: { type: 'STRING', description: 'General description field' }
         },
-        required: [
-          '_row', 'created_at', 'name', 'email', 'country_code', 
-          'mobile_without_country_code', 'company', 'city', 'state', 
-          'country', 'lead_owner', 'crm_status', 'crm_note', 
-          'data_source', 'possession_time', 'description'
-        ]
+        required: ['_row']
       }
     }
   },
