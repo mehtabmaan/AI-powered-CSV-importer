@@ -52,7 +52,7 @@ export class GeminiProvider implements AiProvider {
 
     logger.debug('Sending batch to Google Gemini Structured Outputs...', { batchSize: batch.length });
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
 
     const requestBody = {
       contents: [
