@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LLM_PROVIDER=openai
+      - MAX_BATCH_SIZE=30
+      - MAX_UPLOAD_SIZE_MB=20
+      - NODE_ENV=production
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_BACKEND_URL=http://localhost:4000
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:4000
+      - NEXT_PUBLIC_MAX_UPLOAD_SIZE_MB=20
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    restart: always
