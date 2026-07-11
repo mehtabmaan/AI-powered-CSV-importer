@@ -108,3 +108,20 @@
 /* Brand highlights in light mode */
 .light .bg-brand-500\/10 { background-color: rgba(139, 92, 246, 0.12) !important; }
 .light .bg-brand-500\/5 { background-color: rgba(139, 92, 246, 0.06) !important; }
+
+/* Contrast overrides for headers and tags in light mode */
+.light h1 {
+  background-image: linear-gradient(to right, #0f172a, #5b21b6, #7c3aed) !important;
+  color: transparent !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+}
+
+.light .text-brand-400 {
+  color: #6d28d9 !important; /* brand-700 */
+}
+
+.light .border-brand-500\/20 {
+  border-color: rgba(139, 92, 246, 0.3) !important;
+}
+
