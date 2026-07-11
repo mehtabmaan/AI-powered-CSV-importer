@@ -16,7 +16,9 @@ import {
   Database,
   Users,
   AlertOctagon,
-  Clock
+  Clock,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { VirtualizedTable, Column } from '../components/VirtualizedTable';
 
@@ -60,6 +62,37 @@ const MAX_UPLOAD_SIZE_MB = Number(process.env.NEXT_PUBLIC_MAX_UPLOAD_SIZE_MB || 
 export default function LeadImporter() {
   const [step, setStep] = useState<Step>('upload');
   const [file, setFile] = useState<File | null>(null);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
+  // Initialize theme from localStorage or document class
+  React.useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' | null;
+    const isLight = document.documentElement.classList.contains('light');
+    const initialTheme = savedTheme || (isLight ? 'light' : 'dark');
+    
+    setTheme(initialTheme);
+    if (initialTheme === 'light') {
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    localStorage.setItem('theme', nextTheme);
+    
+    if (nextTheme === 'light') {
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+    }
+  };
   
   // Client preview data
   const [previewHeaders, setPreviewHeaders] = useState<string[]>([]);
@@ -332,8 +365,19 @@ export default function LeadImporter() {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 md:py-16">
+    <div className="max-w-6xl mx-auto px-4 py-8 md:py-16 relative">
       
+      {/* Theme Toggle Button */}
+      <div className="absolute top-4 right-4 z-50">
+        <button
+          onClick={toggleTheme}
+          className="p-2.5 rounded-xl border border-slate-800 bg-slate-900/40 glass glass-hover text-slate-350 transition-all hover:text-white"
+          aria-label="Toggle Theme"
+        >
+          {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </button>
+      </div>
+
       {/* Title & Brand Header */}
       <header className="mb-12 text-center relative">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-44 w-44 rounded-full bg-brand-500/10 blur-[80px]" />
