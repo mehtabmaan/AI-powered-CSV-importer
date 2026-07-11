@@ -6,6 +6,7 @@ dotenv.config();
 
 const envSchema = z.object({
   OPENAI_API_KEY: z.string().min(1, 'OPENAI_API_KEY is required'),
+  GEMINI_API_KEY: z.string().optional(),
   PORT: z.preprocess((val) => Number(val ?? '4000'), z.number().int().positive()),
   MAX_BATCH_SIZE: z.preprocess((val) => Number(val ?? '30'), z.number().int().positive()),
   MAX_UPLOAD_SIZE_MB: z.preprocess((val) => Number(val ?? '20'), z.number().int().positive()),

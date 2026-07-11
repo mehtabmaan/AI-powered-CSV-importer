@@ -3,6 +3,7 @@ import { env } from '../config/env.js';
 import { CONSTANTS } from '../config/constants.js';
 import { AiProvider } from './AiProvider.js';
 import { OpenAIProvider, FallbackResponseError } from './OpenAIProvider.js';
+import { GeminiProvider } from './GeminiProvider.js';
 import { MockProvider } from './MockProvider.js';
 import { logger } from '../utils/logger.js';
 
@@ -13,6 +14,9 @@ export class AiService {
     if (env.LLM_PROVIDER === 'mock') {
       logger.info('Initializing offline Mock Ingestion Provider');
       this.provider = new MockProvider();
+    } else if (env.LLM_PROVIDER === 'gemini') {
+      logger.info('Initializing Google Gemini Ingestion Provider');
+      this.provider = new GeminiProvider();
     } else if (env.LLM_PROVIDER === 'openai') {
       this.provider = new OpenAIProvider();
     } else {
@@ -23,6 +27,7 @@ export class AiService {
 
   /**
    * Orchestrates the extraction of records in a batch, implementing retries and JSON repair logic.
+   * If OpenAI quota is exhausted and a Gemini API Key is present, it dynamically switches to Gemini.
    */
   async extractWithRetry(batch: any[], systemPrompt: string): Promise<any[]> {
     let attempt = 0;
@@ -46,6 +51,14 @@ export class AiService {
           }
         }
 
+        // Check for OpenAI quota exhaustion failover
+        if (this.isQuotaError(error) && env.GEMINI_API_KEY && !(this.provider instanceof GeminiProvider)) {
+          logger.warn('⚠️ OpenAI API Key quota exhausted. Automatically falling back to Google Gemini Provider...');
+          this.provider = new GeminiProvider();
+          attempt = 0; // Reset attempts for the new provider
+          continue; // Immediately retry this batch with Gemini
+        }
+
         // Check if error is transient
         const isTransient = this.isTransientError(error);
 
@@ -64,8 +77,17 @@ export class AiService {
     throw new Error('AI extraction failed after maximum retries');
   }
 
+  private isQuotaError(error: any): boolean {
+    if (error.status === 429) {
+      return true;
+    }
+    const msg = String(error.message || '').toLowerCase();
+    const code = String(error.code || '').toLowerCase();
+    return msg.includes('quota') || msg.includes('billing') || code.includes('quota');
+  }
+
   private isTransientError(error: any): boolean {
-    // If it's an OpenAI API error with a status code
+    // If it's an OpenAI/Gemini API error with a status code
     if (error.status && CONSTANTS.TRANSIENT_HTTP_STATUSES.includes(error.status)) {
       return true;
     }
